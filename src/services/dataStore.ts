@@ -2,7 +2,7 @@ import { User } from '../models/user';
 import { Artist } from '../models/artist';
 import { Track } from '../models/track';
 import { Album } from '../models/album';
-import { Favorites } from '../models/favourites';
+import { Favorites } from '../models/favorites';
 
 export const users: User[] = [];
 export const artists: Artist[] = [];

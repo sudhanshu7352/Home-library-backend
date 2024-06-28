@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { User, CreateUserDto, UpdatePasswordDto } from '../models/user';
 import { users } from '../services/dataStore';
 
@@ -10,6 +10,11 @@ export const getAllUsers = (req: Request, res: Response) => {
 export const getUserById = (req: Request, res: Response) => {
   const { id } = req.params;
   const user = users.find(u => u.id === id);
+  
+  if (!isUuid(id)) {
+    return res.status(400).json({ message: 'Invalid userId' });
+  }
+
   if (!user) {
     return res.status(404).json({ message: `User with id ${id} not found` });
   }
@@ -39,6 +44,10 @@ export const updateUserPassword = (req: Request, res: Response) => {
   const { id } = req.params;
   const { oldPassword, newPassword }: UpdatePasswordDto = req.body;
   const user = users.find(u => u.id === id);
+  
+  if (!isUuid(id)) {
+    return res.status(400).json({ message: 'Invalid user Id' });
+  }
 
   if (!user) {
     return res.status(404).json({ message: `User with id ${id} not found` });
@@ -58,6 +67,10 @@ export const updateUserPassword = (req: Request, res: Response) => {
 export const deleteUser = (req: Request, res: Response) => {
   const { id } = req.params;
   const index = users.findIndex(u => u.id === id);
+  
+  if (!isUuid(id)) {
+    return res.status(400).json({ message: 'Invalid id' });
+  }
 
   if (index === -1) {
     return res.status(404).json({ message: `User with id ${id} not found` });
