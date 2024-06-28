@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { albums, artists, tracks } from "../services/dataStore";
+import { albums, artists, favorites, tracks } from "../services/dataStore";
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { Track } from "../models/track";
 
@@ -86,6 +86,7 @@ export const deleteTrack = (req: Request, res: Response) => {
     if (index === -1) {
         return res.status(404).json({ message: `Track with id ${id} not found.` })
     }
+    favorites.tracks = favorites.tracks.filter((t) => t !== id);
     tracks.splice(index, 1);
     res.status(204).end();
 }  

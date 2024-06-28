@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { albums, artists, tracks } from "../services/dataStore";
+import { albums, artists, favorites, tracks } from "../services/dataStore";
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { Album } from "../models/album";
 
@@ -22,7 +22,7 @@ export const getAlbumById = (req: Request, res: Response) => {
 
 export const createAlbum = (req: Request, res: Response) => {
     const { name, year, artistId } = req.body;
-    
+
     if (!name || year === undefined) {
         return res.status(400).json({ message: `Missing required fields` });
     }
@@ -64,14 +64,24 @@ export const updateAlbum = (req: Request, res: Response) => {
 
 export const deleteAlbum = (req: Request, res: Response) => {
     const { id } = req.params;
-    const index = tracks.findIndex(t => t.id === id);
-    
+    const index = albums.findIndex(t => t.id === id);
+
     if (!isUuid(id)) {
         return res.status(400).json({ message: 'Invalid id' });
     }
     if (index === -1) {
-        return res.status(404).json({ message: `Track with id ${id} not found.` })
+        return res.status(404).json({ message: `Album with id ${id} not found.` })
     }
+
+    // Removing album from favorites
+    favorites.albums = favorites.albums.filter((a) => a !== id);
+
+    tracks.forEach((track) => {
+        if (track.albumId === id) {
+            track.albumId = null;
+        }
+    });
+
     albums.splice(index, 1);
     res.status(204).end();
 }  
